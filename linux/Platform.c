@@ -19,6 +19,7 @@ in the source distribution for its full text.
 #include "TasksMeter.h"
 #include "LoadAverageMeter.h"
 #include "UptimeMeter.h"
+#include "TempMeter.h"
 #include "ClockMeter.h"
 #include "HostnameMeter.h"
 #include "LinuxProcess.h"
@@ -117,6 +118,7 @@ MeterClass* Platform_meterTypes[] = {
    &SwapMeter_class,
    &TasksMeter_class,
    &UptimeMeter_class,
+   &TempMeter_class,
    &BatteryMeter_class,
    &HostnameMeter_class,
    &AllCPUsMeter_class,
@@ -138,6 +140,17 @@ int Platform_getUptime() {
       if (n <= 0) return 0;
    }
    return (int) floor(uptime);
+}
+
+int Platform_getTemp() {
+   int temperature;
+   FILE* fd = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
+   if (fd) {
+      int n = fscanf(fd, "%d", &temperature);
+      fclose(fd);
+      if (n <= 0) return 0;
+   }
+   return temperature;
 }
 
 void Platform_getLoadAverage(double* one, double* five, double* fifteen) {
